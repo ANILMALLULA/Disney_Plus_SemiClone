@@ -40,9 +40,10 @@ export default Header;
 
 const Nav = styled.nav`
   overflow: hidden;
-  height: 70px;
+  min-height: 70px;
   background: #090b13;
   display: flex;
+  justify-content: space-around;
   align-items: center;
   padding: 0 36px;
 `;

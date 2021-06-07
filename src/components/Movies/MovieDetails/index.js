@@ -1,39 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { selectMovies } from "../../../features/movie/movieSlice";
+import { Redirect, useHistory, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import db from "../../../firebase";
 
-function Detail() {
+function Detail(props) {
+  const { id } = useParams();
+  const [movie, setMovie] = useState();
+  let history = useHistory();
+
+  console.log("Yes", movie);
+
+  useEffect(() => {
+    db.collection("movies")
+      .doc(id)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          //save the movie data
+          setMovie(doc.data());
+        } else {
+          history.push("/");
+          //Redirect to Home page
+        }
+      });
+  }, []);
+
   return (
     <Container>
-      <Background>
-        <img src='/images/home-background.png' />
-      </Background>
-      <ImageTitle>
-        <img src='/images/viewers-disney.png' />
-      </ImageTitle>
-      <Controls>
-        <PlayButton>
-          <img src='/images/play-icon-black.png' />
-          <span>PLAY</span>
-        </PlayButton>
-        <TrailerButton>
-          <img src='/images/play-icon-white.png' />
-          <span>Trailer</span>
-        </TrailerButton>
-        <AddButton>
-          <span>+</span>
-        </AddButton>
-        <GroupWatch>
-          <img src='/images/group-icon.png' />
-        </GroupWatch>
-      </Controls>
-      <SubTitle>2018 * 7m * Family, Action</SubTitle>
-      <Description>
-        RGB is a three-channel format containing data for Red, Green, and Blue.
-        RGBA is a four-channel format containing data for Red, Green, Blue, and
-        an Alpha value. ... The CSS function rgba() may have limited support in
-        the older browser. The opacity of the color cannot be specified using
-        this color format.
-      </Description>
+      {movie && (
+        <>
+          <Background>
+            <img src={movie.backgroundImg} alt='disney' />
+          </Background>
+          <ImageTitle>
+            <img src={movie.titleImg} alt='disney' />
+          </ImageTitle>
+          <Controls>
+            <PlayButton>
+              <img src='/images/play-icon-black.png' alt='disney' />
+              <span>PLAY</span>
+            </PlayButton>
+            <TrailerButton>
+              <img src='/images/play-icon-white.png' alt='disney' />
+              <span>Trailer</span>
+            </TrailerButton>
+            <AddButton>
+              <span>+</span>
+            </AddButton>
+            <GroupWatch>
+              <img src='/images/group-icon.png' alt='disney' />
+            </GroupWatch>
+          </Controls>
+          <SubTitle>{movie.subTitle}</SubTitle>
+          <Description>{movie.description}</Description>
+        </>
+      )}
     </Container>
   );
 }
@@ -42,7 +65,7 @@ export default Detail;
 
 const Container = styled.div`
   min-height: calc(100vh - 70px);
-  padding: 0 calc(3.5vw + 5px);
+  padding: calc(3.5vw + 5px);
   position: relative;
 `;
 
@@ -53,7 +76,7 @@ const Background = styled.div`
   left: 0;
   right: 0;
   z-index: -1;
-  opacity: 0.7;
+  opacity: 0.5;
   img {
     width: 100%;
     height: 100%;
@@ -62,10 +85,9 @@ const Background = styled.div`
 `;
 
 const ImageTitle = styled.div`
-  height: 30vh;
-  min-height: 170px;
-  width: 35vw;
-  min-width: 200px;
+  margin: 20px 0;
+  max-height: 200px;
+  max-width: 260px;
   img {
     width: 100%;
     height: 100%;
@@ -76,6 +98,7 @@ const ImageTitle = styled.div`
 const Controls = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 `;
 
 const PlayButton = styled.button`
@@ -83,6 +106,7 @@ const PlayButton = styled.button`
   font-size: 15px;
   padding: 0 24px;
   margin-right: 22px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   height: 56px;
@@ -134,7 +158,7 @@ const SubTitle = styled.p`
 const Description = styled.p`
   line-height: 1.4;
   color: rgb(249, 249, 249);
-  font-size: 20px;
+  font-size: 17px;
   margin-top: 16px;
   min-height: 20px;
   margin-top: 26px;

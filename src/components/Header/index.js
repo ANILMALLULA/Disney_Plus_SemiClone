@@ -1,65 +1,125 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { auth, provider } from "../../firebase";
+
+import {
+  selectUserName,
+  selectUserPhoto,
+  setUserLogin,
+  setSignOut,
+} from "../../features/user/userSlice";
+import { useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 function Header() {
+  const userName = useSelector(selectUserName);
+  const history = useHistory();
+  const userPhoto = useSelector(selectUserPhoto);
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        dispatch(
+          setUserLogin({
+            name: user.displayName,
+            email: user.email,
+            photo: user.photoURL,
+          })
+        );
+        history.push("/");
+      }
+    });
+  }, []);
+
+  const dispatch = useDispatch();
+
+  const signIn = () => {
+    auth.signInWithPopup(provider).then((res) => {
+      dispatch(
+        setUserLogin({
+          name: res.user.displayName,
+          email: res.user.email,
+          photo: res.user.photoURL,
+        })
+      );
+      history.replace("/");
+    });
+  };
+
+  const signOut = () => {
+    auth.signOut().then(() => {
+      dispatch(setSignOut());
+      history.replace("login");
+    });
+  };
+
   return (
     <>
       <Nav>
         <Logo src='/images/logo.svg' />
-        <NavMenu>
+
+        {!userName ? (
+          <Login onClick={() => signIn()}>LOGIN</Login>
+        ) : (
+          <>
+            <NavMenu>
+              <a>
+                <img src='/images/home-icon.svg' alt='disney' />
+                <span>Home</span>
+              </a>
+              <a>
+                <img src='/images/search-icon.svg' alt='disney' />
+                <span>SEARCH</span>
+              </a>
+              <a>
+                <img src='/images/watchlist-icon.svg' alt='disney' />
+                <span>WATCHLIST</span>
+              </a>
+              <a>
+                <img src='/images/original-icon.svg' alt='disney' />
+                <span>ORIGINALS</span>
+              </a>
+              <a>
+                <img src='/images/movie-icon.svg' alt='disney' />
+                <span>MOVIES</span>
+              </a>
+              <a>
+                <img src='/images/series-icon.svg' alt='disney' />
+                <span>SERIES</span>
+              </a>
+            </NavMenu>
+            <UserImg src={userPhoto} alt='disney' onClick={signOut} />
+          </>
+        )}
+      </Nav>
+      {userName ? (
+        <MobileNav>
           <a>
-            <img src='/images/home-icon.svg' />
+            <img src='/images/home-icon.svg' alt='disney' />
             <span>Home</span>
           </a>
           <a>
-            <img src='/images/search-icon.svg' />
+            <img src='/images/search-icon.svg' alt='disney' />
             <span>SEARCH</span>
           </a>
           <a>
-            <img src='/images/watchlist-icon.svg' />
+            <img src='/images/watchlist-icon.svg' alt='disney' />
             <span>WATCHLIST</span>
           </a>
           <a>
-            <img src='/images/original-icon.svg' />
+            <img src='/images/original-icon.svg' alt='disney' />
             <span>ORIGINALS</span>
           </a>
           <a>
-            <img src='/images/movie-icon.svg' />
+            <img src='/images/movie-icon.svg' alt='disney' />
             <span>MOVIES</span>
           </a>
           <a>
-            <img src='/images/series-icon.svg' />
+            <img src='/images/series-icon.svg' alt='disney' />
             <span>SERIES</span>
           </a>
-        </NavMenu>
-        <UserImg src='/images/ProfPic.jpg' />
-      </Nav>
-      <MobileNav>
-        <a>
-          <img src='/images/home-icon.svg' />
-          <span>Home</span>
-        </a>
-        <a>
-          <img src='/images/search-icon.svg' />
-          <span>SEARCH</span>
-        </a>
-        <a>
-          <img src='/images/watchlist-icon.svg' />
-          <span>WATCHLIST</span>
-        </a>
-        <a>
-          <img src='/images/original-icon.svg' />
-          <span>ORIGINALS</span>
-        </a>
-        <a>
-          <img src='/images/movie-icon.svg' />
-          <span>MOVIES</span>
-        </a>
-        <a>
-          <img src='/images/series-icon.svg' />
-          <span>SERIES</span>
-        </a>
-      </MobileNav>
+        </MobileNav>
+      ) : null}
     </>
   );
 }
@@ -68,7 +128,7 @@ export default Header;
 
 const Nav = styled.nav`
   overflow: hidden;
-  min-height: 70px;
+  min-height: 80px;
   background: #090b13;
   display: flex;
   justify-content: space-between;
@@ -145,4 +205,21 @@ const UserImg = styled.img`
   height: 50px;
   border-radius: 30px;
   cursor: pointer;
+`;
+
+const Login = styled.div`
+  border: 1px solid white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease 0s;
+
+  &:hover {
+    background-color: #f9f9f9;
+    color: black;
+
+    border-color: transparent;
+  }
 `;

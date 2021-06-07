@@ -17,10 +17,10 @@ function ImageSilder() {
   return (
     <Carousel {...settings}>
       <Wrap>
-        <img src='/images/slider-badging.jpg' />
+        <img src='/images/slider-badging.jpg' alt='disney' />
       </Wrap>
       <Wrap>
-        <img src='/images/slider-badag.jpg' />
+        <img src='/images/slider-badag.jpg' alt='disney' />
       </Wrap>
     </Carousel>
   );

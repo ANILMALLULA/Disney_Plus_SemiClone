@@ -16,3 +16,5 @@ npm i react-router-dom
 Redux and Firebase for state management and application deployment
 npm i firebase
 npm i firebase-tools
+
+

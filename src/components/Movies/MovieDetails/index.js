@@ -138,4 +138,5 @@ const Description = styled.p`
   margin-top: 16px;
   min-height: 20px;
   margin-top: 26px;
+  max-width: 750px;
 `;
